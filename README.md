@@ -17,6 +17,20 @@ The service uses PostgreSQL in deployment and H2 for tests. Configure
 `SPRING_DATASOURCE_PASSWORD`, `JWT_SECRET`, and `INTERNAL_SERVICE_SECRET`
 through environment variables.
 
+## Environment variables
+
+Local Compose reads these from the root platform `.env`. In GitHub Actions,
+store secret values under **Settings → Secrets and variables → Actions** in
+`Microsserv52/account`. Kubernetes values belong in `platform-secrets`.
+
+| Variable | Purpose |
+| --- | --- |
+| `SPRING_DATASOURCE_URL` | PostgreSQL JDBC URL |
+| `SPRING_DATASOURCE_USERNAME` | Database username |
+| `SPRING_DATASOURCE_PASSWORD` | Database password |
+| `JWT_SECRET` | Shared JWT HMAC secret |
+| `INTERNAL_SERVICE_SECRET` | Auth-to-Account credential |
+
 ## GitHub Actions secrets
 
 Add these under **Settings → Secrets and variables → Actions** in
