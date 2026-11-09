@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 @RestController
 @RequestMapping("/accounts")
@@ -42,6 +44,11 @@ public class AccountResource {
         return repository.findAll().stream().map(this::toOutput).toList();
     }
 
+    @GetMapping("/me")
+    public AccountOut me(@AuthenticationPrincipal Jwt jwt) {
+        return findById(UUID.fromString(jwt.getSubject()));
+    }
+
     @GetMapping("/{id}")
     public AccountOut findById(@PathVariable UUID id) {
         return repository.findById(id).map(this::toOutput)
@@ -50,7 +57,14 @@ public class AccountResource {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable UUID id) {
+    public void delete(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        Account account = repository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found"));
+        if (id.toString().equals(jwt.getSubject()) ||
+            java.util.Arrays.stream(account.getRoles().split(","))
+                .anyMatch(role -> "ROLE_ADMIN".equals(role.trim()))) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Administrator accounts cannot be deleted here");
+        }
         repository.deleteById(id);
     }
 
