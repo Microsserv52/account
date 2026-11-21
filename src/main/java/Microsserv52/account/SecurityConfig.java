@@ -28,7 +28,7 @@ public class SecurityConfig {
         converter.setJwtGrantedAuthoritiesConverter(authorities);
         return http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/health", "/actuator/prometheus").permitAll()
                 .requestMatchers(HttpMethod.POST, "/accounts").permitAll()
                 .requestMatchers("/accounts/internal/credentials").permitAll()
                 .requestMatchers(HttpMethod.GET, "/accounts/me").authenticated()
